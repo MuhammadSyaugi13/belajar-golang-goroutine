@@ -2,6 +2,7 @@ package belajar_golang_goroutine
 
 import (
 	"fmt"
+	"strconv"
 	"testing"
 	"time"
 )
@@ -83,3 +84,92 @@ func TestInOutChannel(t *testing.T) {
 }
 
 /* ./ channel in dan out pada parameter */
+
+/* buffered channel */
+
+func TestBufferedChannel(t *testing.T) {
+
+	fmt.Println("oke")
+
+	profile := []map[string]interface{}{
+		{
+			"nama":              "andi fhad9fasulajskca;slkd[as]da[ps[dpausfaiuoskalksjdlakjsdna,sfmas,nfaksifhi3429839a98sa7987(*&*&&^%765)]]",
+			"umur":              3647392859320439482,
+			"status_perkawinan": true,
+		},
+		{
+			"nama":              "andi",
+			"umur":              36,
+			"status_perkawinan": true,
+		}, {
+			"nama":              "andi",
+			"umur":              36,
+			"status_perkawinan": true,
+		},
+		{
+			"nama":              "andi xhsdjfskdjkjxhkjfhskdjhfkjxhkjhfkdshkfshdkjfhkjhk",
+			"umur":              36342352342342,
+			"status_perkawinan": true,
+		},
+	}
+
+	title := "coba buffered channel"
+
+	channel := make(chan interface{}, 2)
+
+	go func() {
+		channel <- title
+		channel <- profile
+		channel <- "hahah"
+	}()
+
+	go func() {
+
+		fmt.Println(<-channel)
+		fmt.Println(<-channel)
+		fmt.Println(<-channel)
+
+	}()
+
+	time.Sleep(2 * time.Second)
+	fmt.Println("selesai")
+}
+
+/* ./ buffered channel */
+
+/* range channel */
+
+func TestRangeChannel(t *testing.T) {
+
+	channel := make(chan string)
+
+	go func() {
+		fmt.Println("jalan go func")
+		for i := 0; i < 10000000; i++ {
+			fmt.Println("jalan for")
+			fmt.Println("")
+			channel <- "data ke " + strconv.Itoa(i)
+		}
+
+		fmt.Println("close channel")
+		fmt.Println("")
+		close(channel)
+	}()
+
+	index := 1
+	for datas := range channel {
+		fmt.Print("index ke :", index, " :")
+		fmt.Println("menerima data", datas)
+		index++
+	}
+
+	time.Sleep(2 * time.Second)
+	fmt.Println("selesai")
+
+	// for i := 0; i < 10000000; i++ {
+	// 	fmt.Println("index ke :", i)
+	// }
+
+}
+
+/* ./ range channel */
