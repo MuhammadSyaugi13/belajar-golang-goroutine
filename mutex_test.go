@@ -31,7 +31,7 @@ func TestMutex(t *testing.T) {
 
 /* ./ Mutex */
 
-/* Mutex */
+/* RWMutex */
 
 type BankAccount struct {
 	RWMutex sync.RWMutex
@@ -139,20 +139,21 @@ func TestDeadlock(t *testing.T) {
 
 /* wait group */
 
-func RunAsyncronous(group *sync.WaitGroup) {
+func RunAsyncronous(group *sync.WaitGroup, i int) {
 	defer group.Done()
 
 	group.Add(1)
 
-	fmt.Println("Hello")
-	time.Sleep(time.Second)
+	fmt.Println("Hello", i)
+
+	time.Sleep(1 * time.Second)
 }
 
 func TestWaitGroup(t *testing.T) {
 	group := &sync.WaitGroup{}
 
-	for i := 0; i < 100; i++ {
-		go RunAsyncronous(group)
+	for i := 0; i < 1000; i++ {
+		go RunAsyncronous(group, i)
 	}
 
 	group.Wait()

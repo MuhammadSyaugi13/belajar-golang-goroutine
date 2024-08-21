@@ -60,6 +60,7 @@ import (
 	"fmt"
 	"math/rand"
 	"strconv"
+	"sync"
 	"testing"
 	"time"
 )
@@ -212,3 +213,114 @@ func TestDurasi(t *testing.T) {
 }
 
 /* ./ test durasi */
+
+/*coba wg*/
+
+func doWork(id int, wg *sync.WaitGroup) {
+	defer wg.Done() // Menandakan bahwa goroutine ini selesai
+	fmt.Printf("Goroutine %d mulai\n", id)
+	time.Sleep(2 * time.Second) // Simulasi pekerjaan
+	fmt.Printf("Goroutine %d selesai\n", id)
+}
+
+func TestCobaWg(t *testing.T) {
+	var wg sync.WaitGroup
+
+	for i := 1; i <= 3; i++ {
+		wg.Add(1) // Menambahkan satu goroutine yang akan ditunggu
+		go doWork(i, &wg)
+	}
+
+	wg.Wait() // Menunggu semua goroutine selesai
+	fmt.Println("Program selesai")
+}
+
+/*./ coba wg*/
+
+/*coba wg*/
+
+func doWorkTanpaWG(id int) {
+	// defer wg.Done() // Menandakan bahwa goroutine ini selesai
+	fmt.Printf("Goroutine %d mulai\n", id)
+	time.Sleep(2 * time.Second) // Simulasi pekerjaan
+	fmt.Printf("Goroutine %d selesai\n", id)
+}
+
+func TestTanpaCobaWg(t *testing.T) {
+
+	for i := 1; i <= 3; i++ {
+		// wg.Add(1) // Menambahkan satu goroutine yang akan ditunggu
+		go doWorkTanpaWG(i)
+	}
+
+	// wg.Wait() // Menunggu semua goroutine selesai
+	fmt.Println("Program selesai")
+
+	time.Sleep(5 * time.Second)
+}
+
+/*./ coba wg*/
+
+// /* Test Deadlock */
+
+// type UserBalance struct {
+// 	sync.Mutex // ini sama seperti Mutex: "Mutex sync.Mutex"
+// 	Name       string
+// 	Balance    int
+// }
+
+// func (user *UserBalance) Lock() {
+// 	user.Mutex.Lock()
+// }
+
+// func (user *UserBalance) Unlock() {
+// 	user.Mutex.Unlock()
+// }
+
+// func (user *UserBalance) Change(amount int) {
+// 	user.Balance = user.Balance + amount
+// }
+
+// func Transfer(user1 *UserBalance, user2 *UserBalance, amount int) {
+// 	user1.Lock()
+// 	fmt.Println("Lock User1", user1.Name)
+// 	user1.Change(-amount)
+// 	fmt.Println("Change amount User1", user1.Name)
+
+// 	time.Sleep(1 * time.Second)
+
+// 	user2.Lock()
+// 	fmt.Println("Lock User2", user2.Name)
+// 	user2.Change(amount)
+// 	fmt.Println("Change amount User2", user2.Name)
+
+// 	time.Sleep(1 * time.Second)
+
+// 	user1.Unlock()
+// 	user2.Unlock()
+
+// 	fmt.Println("Selesai transfer dari : ", user1.Name)
+
+// }
+
+// func TestDeadlock(t *testing.T) {
+// 	user1 := UserBalance{
+// 		Name:    "Eko",
+// 		Balance: 1000000,
+// 	}
+
+// 	user2 := UserBalance{
+// 		Name:    "Budi",
+// 		Balance: 1000000,
+// 	}
+
+// 	go Transfer(&user1, &user2, 100000)
+// 	go Transfer(&user2, &user1, 200000)
+
+// 	time.Sleep(10 * time.Second)
+
+// 	fmt.Println("User : ", user1.Name, "Balance : ", user1.Balance)
+// 	fmt.Println("User : ", user2.Name, "Balance : ", user2.Balance)
+// }
+
+// /* ./ Test Deadlock */
