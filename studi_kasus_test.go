@@ -324,3 +324,50 @@ func TestTanpaCobaWg(t *testing.T) {
 // }
 
 // /* ./ Test Deadlock */
+
+/* aggregating data */
+
+func TestAggregating(t *testing.T) {
+	start := time.Now()
+	username := fetchUser()
+
+	respch := make(chan any, 2)
+	group := &sync.WaitGroup{}
+
+	group.Add(2)
+	go fetchUserLikes(username, respch, group)
+	go fetchUserMatch(username, respch, group)
+
+	group.Wait() // tunggu sampai group selesai
+
+	close(respch) // close channel
+
+	for resp := range respch {
+		fmt.Println("resp", resp)
+	}
+
+	fmt.Println("took : ", time.Since(start))
+
+}
+
+func fetchUser() string {
+	time.Sleep(100 * time.Millisecond)
+	return "Bob"
+}
+
+func fetchUserLikes(userName string, respch chan any, group *sync.WaitGroup) {
+	time.Sleep(150 * time.Millisecond)
+
+	respch <- 11
+	group.Done()
+
+}
+
+func fetchUserMatch(userName string, respch chan any, group *sync.WaitGroup) {
+	time.Sleep(100 * time.Millisecond)
+
+	respch <- userName + "match with Anna"
+	group.Done()
+}
+
+/* ./ aggregating data */

@@ -11,11 +11,17 @@ func TestRaceCondition(t *testing.T) {
 
 	for i := 0; i < 1000; i++ {
 
-		go func() {
+		func() {
 			for j := 0; j < 100; j++ {
 				x += 1
 			}
 		}()
+
+		// go func() {
+		// 	for j := 0; j < 100; j++ {
+		// 		x += 1
+		// 	}
+		// }()
 
 	}
 

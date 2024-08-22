@@ -1,0 +1,58 @@
+package main
+
+import (
+	"database/sql"
+	"fmt"
+	"log"
+	"sync"
+
+	_ "github.com/go-sql-driver/mysql"
+)
+
+func queryDatabase(db *sql.DB, query string, wg *sync.WaitGroup) {
+	defer wg.Done()
+	rows, err := db.Query(query)
+	if err != nil {
+		log.Println("Error executing query:", err)
+		return
+	}
+	defer rows.Close()
+
+	for rows.Next() {
+		var result string
+		if err := rows.Scan(&result); err != nil {
+			log.Println("Error scanning row:", err)
+			return
+		}
+		fmt.Println(result)
+	}
+}
+
+func main() {
+	// Setup database connection
+	dsn := "user:password@tcp(127.0.0.1:3306)/dbname"
+	db, err := sql.Open("mysql", dsn)
+	if err != nil {
+		log.Fatal("Error opening database connection:", err)
+	}
+	defer db.Close()
+
+	// WaitGroup to wait for all goroutines to finish
+	var wg sync.WaitGroup
+
+	// Define your queries
+	queries := []string{
+		"SELECT name FROM users WHERE age > 25",
+		"SELECT email FROM users WHERE status = 'active'",
+		"SELECT COUNT(*) FROM orders WHERE created_at > NOW() - INTERVAL 1 DAY",
+	}
+
+	// Start goroutines for each query
+	for _, query := range queries {
+		wg.Add(1)
+		go queryDatabase(db, query, &wg)
+	}
+
+	// Wait for all goroutines to finish
+	wg.Wait()
+}
